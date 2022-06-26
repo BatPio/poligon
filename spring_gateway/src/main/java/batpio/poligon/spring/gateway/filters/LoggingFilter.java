@@ -29,7 +29,9 @@ public class LoggingFilter implements GlobalFilter, Ordered {
             @Override
             public Flux<DataBuffer> getBody() {
                 return super.getBody().map(ds -> {
-                    System.out.println("Request body: " + dataBufferToString(ds) + " path: " + path + " th: "+ Thread.currentThread().getName());
+                    if (ds != null) {
+                        System.out.println("Request Body: " + dataBufferToString(ds) + " th: " + Thread.currentThread().getName());
+                    }
                     return ds;
                 });
             }

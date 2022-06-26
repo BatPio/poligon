@@ -1,0 +1,4 @@
+routing:
+  destUrl: http://localhost:9000
+webclient:
+  threadPoolSize: 10

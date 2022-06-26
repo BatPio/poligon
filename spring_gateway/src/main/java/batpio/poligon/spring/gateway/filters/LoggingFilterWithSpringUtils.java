@@ -38,10 +38,8 @@ public class LoggingFilterWithSpringUtils implements GlobalFilter, Ordered {
             System.out.println("Response Body: " + body + " path: " + path + " th: " + Thread.currentThread().getName());
             return Optional.ofNullable(body).map(Mono::just).orElse(Mono.empty());
         };
-
         ModifyResponseBodyGatewayFilterFactory.Config config = new ModifyResponseBodyGatewayFilterFactory.Config();
         config.setRewriteFunction(String.class, String.class,responseHookFunction);
-
         GatewayFilter responseLoggingFilter = modifyResponseBodyGatewayFilterFactory.apply(config);
 
         Function<ServerHttpRequest, Mono<Void>> mutator = serverHttpRequest -> {
@@ -50,7 +48,9 @@ public class LoggingFilterWithSpringUtils implements GlobalFilter, Ordered {
                 public Flux<DataBuffer> getBody() {
                     Flux<DataBuffer> flux = super.getBody();
                     DataBuffer dataBuffer = exchange.getAttribute(ServerWebExchangeUtils.CACHED_REQUEST_BODY_ATTR);
-                    System.out.println("Request Body: " + dataBufferToString(dataBuffer) + " th: " + Thread.currentThread().getName());
+                    if (dataBuffer != null) {
+                        System.out.println("Request Body: " + dataBufferToString(dataBuffer) + " th: " + Thread.currentThread().getName());
+                    }
                     return flux;
                 }
             };

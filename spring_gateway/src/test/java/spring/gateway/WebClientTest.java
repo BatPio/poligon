@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -40,6 +41,7 @@ import java.util.concurrent.Executors;
         "routing.destUrl=http://localhost:9000",
         "webclient.threadPoolSize=2"
 })
+@ContextConfiguration(classes = JettyConfig.class)
 //@AutoConfigureWireMock(port = 0)
 //@WireMockTest(httpPort = 9000)
 public class WebClientTest {
@@ -112,7 +114,7 @@ public class WebClientTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
-                .isEqualTo(DELAYED_PATH_RESPONSE);
+                .isEqualTo(DEFAULT_RESPONSE);
     }
 
     @Test

@@ -1,18 +1,13 @@
-package batpio.poligon.spring.gateway.config;
+package spring.gateway;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.reactive.JettyClientHttpConnector;
 import org.springframework.http.client.reactive.JettyResourceFactory;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.client.reactive.ReactorResourceFactory;
 
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 
 @Configuration
-public class NettyConfig {
+public class JettyConfig {
 
     @Bean
     JettyResourceFactory jettyClientResourceFactory() {

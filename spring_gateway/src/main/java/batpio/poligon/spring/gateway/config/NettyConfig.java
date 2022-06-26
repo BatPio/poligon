@@ -17,7 +17,7 @@ public class NettyConfig {
     @Bean
     JettyResourceFactory jettyClientResourceFactory() {
         JettyResourceFactory factory = new JettyResourceFactory();
-        factory.setExecutor(Executors.newFixedThreadPool(100));
+        factory.setExecutor(Executors.newFixedThreadPool(10));
         return factory;
     }
 

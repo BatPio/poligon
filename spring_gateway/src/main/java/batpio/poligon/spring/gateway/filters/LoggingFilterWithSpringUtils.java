@@ -31,10 +31,11 @@ public class LoggingFilterWithSpringUtils implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getURI().getPath();
         System.out.println("LoggingFilter:" + Thread.currentThread().getName());
 
         RewriteFunction<String, String> responseHookFunction = (ex, body) -> {
-            System.out.println("Response Body: " + body + " th: " + Thread.currentThread().getName());
+            System.out.println("Response Body: " + body + " path: " + path + " th: " + Thread.currentThread().getName());
             return Optional.ofNullable(body).map(Mono::just).orElse(Mono.empty());
         };
 

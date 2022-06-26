@@ -9,7 +9,9 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.Admin;
 import com.github.tomakehurst.wiremock.extension.PostServeAction;
+import com.github.tomakehurst.wiremock.http.DelayDistribution;
 import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.http.UniformDistribution;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -59,7 +62,7 @@ public class WebClientTest {
 
                                 @Override
                                 public void doGlobalAction(ServeEvent serveEvent, Admin admin) {
-                                    System.out.println("WireMock request at URL: "+ serveEvent.getRequest().getAbsoluteUrl());
+                                    System.out.println("WireMock request at URL: "+ serveEvent.getRequest().getAbsoluteUrl() + " body " + serveEvent.getRequest().getBodyAsString());
                                 }
                             }))
                     .build();
@@ -71,7 +74,11 @@ public class WebClientTest {
                         .withBody(DELAYED_PATH_RESPONSE)));
         wm.stubFor(get(urlMatching("/complexRoute/.*"))
                 .willReturn(ok()
-                        .withBody(DELAYED_PATH_RESPONSE)));
+                        .withBody(DEFAULT_RESPONSE)));
+        wm.stubFor(post(urlMatching("/complexRoute/.*"))
+                .willReturn(ok()
+                        //.withRandomDelay(new UniformDistribution(100, 2000))
+                        .withBody(DEFAULT_RESPONSE)));
         wm.stubFor(get(UrlPattern.ANY)
                 .atPriority(10)
                 .willReturn(ok()
@@ -110,18 +117,19 @@ public class WebClientTest {
 
     @Test
     public void complexRoutePathParallelTest() throws InterruptedException {
-        int requestCounter = 5_000;
-        ExecutorService service = Executors.newFixedThreadPool(3000);
+        int requestCounter = 200;
+        ExecutorService service = Executors.newFixedThreadPool(200);
         CountDownLatch latch = new CountDownLatch(requestCounter);
         for(int i=0; i< requestCounter; i++) {
             final int requestNo = i;
             Runnable sender = () -> {
                 webClient
-                        .get().uri(RoutingConfig.COMPLEX_ROUTE_PATH + "/" + requestNo)
+                        .post().uri(RoutingConfig.COMPLEX_ROUTE_PATH + "/" + requestNo)
+                        .body(BodyInserters.fromObject("Body of request" + requestNo))
                         .exchange()
                         .expectStatus().isOk()
                         .expectBody(String.class)
-                        .isEqualTo(DELAYED_PATH_RESPONSE)
+                        .isEqualTo(DEFAULT_RESPONSE)
                         .consumeWith(entity -> {
                             latch.countDown();
                         });

@@ -1,0 +1,28 @@
+{
+	"type": "record",
+	"namespace": "model.avro",
+	"name": "ComplexAvro",
+	"fields": [
+		{
+			"name": "name",
+			"type": "string"
+		},
+		{
+			"name": "timestamp",
+			"type": "string"
+		},
+		{
+			"name": "internal",
+			"type": {
+				"type": "record",
+				"name": "InnerAvro",
+				"fields": [
+					{
+						"name": "innerName",
+						"type": "string"
+					}
+			    ]
+			}
+		}
+	]
+}

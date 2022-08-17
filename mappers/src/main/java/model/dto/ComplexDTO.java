@@ -11,7 +11,7 @@ public class ComplexDTO {
     private InnerInternal internal;
 
     @Data
-    private class InnerInternal {
+    public static class InnerInternal {
         private String innerName;
     }
 
